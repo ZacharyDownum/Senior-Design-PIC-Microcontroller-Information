@@ -10,7 +10,6 @@
 #define FCY 4000000UL //FCY = FOSC / 2 unsigned long (UL) 
 // pc24fj128ga204 = 8MHz internal oscillator
 #include <libpic30.h>
-#include <stdio.h>
 #include <string.h>
 void LCD_ClearCommand();
 void LCD_Init();
@@ -20,21 +19,21 @@ void LCD_PrintString(char *str);
 int main(void) {
 
     char str1[17] = "DES:32°C ACT:34°";
-    int len = strlen(str1); // = to 5
-    LCD_PrintString(str1);
+    ANSC = 0; //turn analog bits off
+    Nop();
+    TRISC = 0; //turn digital bits to output
+    Nop();
 
-    //    ANSC = 0; //turn analog bits off
-    //    Nop();
-    //    TRISC = 0; //turn digital bits to output
-    //    Nop();
-    //
-    //    LCD_Init();
-    //    LCD_SetDisplayAddressCommand(0x40);
-    //    LCD_ClearCommand();
-    //
-    //    while (1) {
-    //        __delay_ms(1000);
-    //    }
+    LCD_Init();
+    LCD_SetDisplayAddressCommand(0x40);
+    LCD_ClearCommand();
+    
+    while (1)
+    {
+        LCD_PrintString(str1);
+        __delay_ms(2000);
+        LCD_ClearCommand();
+    }
 
     return 0;
 }
@@ -97,7 +96,7 @@ void LCD_PrintString(char *str) {
      * the array to the LCD controller. Special characters require a different
      * method
      * @param: str: the string to be output on the LCD 
-    */
+     */
     char ch;
     int i = 0;
 
