@@ -18,13 +18,12 @@ int main(void)
     TRISB = 0;
     Nop();
     
-    //setting all pins on port B to HIGH
-    PORTB = 0xffff;
+    //setting RB4 to HIGH (pin 11)
+    PORTBbits.RB4 = 1;
     Nop();
     
     while (true)
     {
-        Nop();
     }
     
     return EXIT_SUCCESS;
