@@ -18,8 +18,8 @@ int main(void)
     TRISB = 0;
     Nop();
     
-    //setting RB4 to HIGH (pin 11)
-    PORTBbits.RB4 = 1;
+    //setting RB5 to active HIGH (pin 14)
+    LATBbits.LATB5 = 1;
     Nop();
     
     while (true)
