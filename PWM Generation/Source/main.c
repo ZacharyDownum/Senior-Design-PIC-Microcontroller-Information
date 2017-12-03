@@ -25,7 +25,6 @@ int main(void)
     TRISB = 0;
     Nop();
     
-    
     //setting RB5 to active HIGH (pin 14)
     //This operation will remain here for a while to ensure
     //The PIC is actually working as the PWM functionality
@@ -33,10 +32,20 @@ int main(void)
     LATBbits.LATB5 = 1;
     Nop();
     
+    //disables OC1 while the pwm is set up
     OC1CON1 = 0x0000;
-    OC1R = 0x0026;
-    OC1RS = 0x0026;
+    
+    //OC1R / OC1RS = duty cycle %
+    OC1R = 0x00023;
+    OC1RS = 0x0046;
+    //turns on edge-aligned pwm functionality (110 on bits 0-2) and
+    //sets the timer to timer2 (000 on bits 10-12)
     OC1CON1 = 0x0006;
+    
+    //synchronizes the pwm to this OC module and 
+    OC1CON2 = 0x001F;
+    OC1CON2bits.OCTRIG = 0;
+    
     PR2 = 0x0046;
     IPC1bits.T2IP = 1;
     IFS0bits.T2IF = 0;
@@ -51,7 +60,6 @@ int main(void)
     
     while (true)
     {
-        
     }
     
     return EXIT_SUCCESS;
