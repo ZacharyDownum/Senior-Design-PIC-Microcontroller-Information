@@ -36,21 +36,33 @@ int main(void)
     OC1CON1 = 0x0000;
     
     //OC1R / OC1RS = duty cycle %
-    OC1R = 0x00023;
-    OC1RS = 0x0046;
+    OC1R = 0x7A12;
+    OC1RS = 0xF424;
     //turns on edge-aligned pwm functionality (110 on bits 0-2) and
     //sets the timer to timer2 (000 on bits 10-12)
     OC1CON1 = 0x0006;
     
-    //synchronizes the pwm to this OC module and 
+    //synchronizes the pwm to this OC module
     OC1CON2 = 0x001F;
     OC1CON2bits.OCTRIG = 0;
     
-    PR2 = 0x0046;
+    //The period and frequency are based off of the equation
+    //Period = [PRx + 1] * Tcy * [Timer Prescale Value]
+    //Frequency = 1 / Period
+    //Where Tcy = 2 * Tosc
+    //and Fcy = Fosc / 2
+    //for the PIC24FJ128GA202, Tosc = 31.25 ns, and Fosc = 8MHz
+    PR2 = 0xF424;
     IPC1bits.T2IP = 1;
     IFS0bits.T2IF = 0;
     IEC0bits.T2IE = 1;
-    T2CONbits.TON = 1;
+    
+    //bit 15 is the enable/disable bit (TON)
+    //bits 4-5 are the timer prescaler bits (TCKPS)
+    //(00 = 1:1, 01 = 1:8, 10 = 1:64, 11 = 1:256)
+    //This turns timer2 on with the prescaler value set to 1:1
+    T2CON = 0x8000;
+    
     
     //sets the remappable pin RP0 to output the value of OC1 (the output compare
     //pin that is being used to generate the PWM)
