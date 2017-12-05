@@ -32,19 +32,30 @@ void PIC_Initialization(void)
 //uses OC1's PWM functionality and the RB0 pin
 void Example_PWM_Initialization(void)
 {
-        //disables OC1 while the pwm is set up
+    //disables OC1 while the pwm is set up
     OC1CON1 = 0x0000;
     
-    //OC1R / OC1RS = duty cycle %
-    OC1R = 0x00EF;
-    OC1RS = 0x00F0;
-    //turns on edge-aligned pwm functionality (110 on bits 0-2) and
-    //sets the timer to timer2 (000 on bits 10-12)
-    OC1CON1 = 0x0006;
+    //sets the remappable pin RP0 to output the value of OC1 (the output compare
+    //pin that is being used to generate the PWM)
+    //See page 174 in the PIC24FJ128GA204 documentation to find the list
+    //of all values that can be mapped to the remappable pins
+    RPOR0 = 13;
     
-    //synchronizes the pwm to this OC module
+    //OC1R / OC1RS = duty cycle %
+    OC1R = 0x0021;
+    //sets the period
+    OC1RS = 0x0042;
+    
+    //sets OC1 as the synchronization source
     OC1CON2 = 0x001F;
     OC1CON2bits.OCTRIG = 0;
+    
+    //sets the pwm timer to the peripheral clock (Fcy)
+    //(bits set to 111)
+    OC1CON1bits.OCTSEL = 0x0007;
+    
+    //turns on edge-aligned pwm functionality (bits set to 110)
+    OC1CON1bits.OCM = 0x0006;
     
     //The period and frequency are based off of the equation
     //Period = [PRx + 1] * Tcy * [Timer Prescale Value]
@@ -52,22 +63,16 @@ void Example_PWM_Initialization(void)
     //Where Tcy = 2 * Tosc
     //and Fcy = Fosc / 2
     //for the PIC24FJ128GA202, Tosc = 31.25 ns, and Fosc = 8MHz
-    PR2 = 0x00F0;
-    IPC1bits.T2IP = 1;
-    IFS0bits.T2IF = 0;
-    IEC0bits.T2IE = 1;
+    //PR2 = 0x00F0;
+    //IPC1bits.T2IP = 1;
+    //IFS0bits.T2IF = 0;
+    //IEC0bits.T2IE = 1;
     
     //bit 15 is the enable/disable bit (TON)
     //bits 4-5 are the timer prescaler bits (TCKPS)
     //(00 = 1:1, 01 = 1:8, 10 = 1:64, 11 = 1:256)
     //This turns timer2 on with the prescaler value set to 1:1
-    T2CON = 0x8000;
-    
-    //sets the remappable pin RP0 to output the value of OC1 (the output compare
-    //pin that is being used to generate the PWM)
-    //See page 174 in the PIC24FJ128GA204 documentation to find the list
-    //of all values that can be mapped to the remappable pins
-    RPOR0 = 13;
+    //T2CON = 0x8000;
 }
 
 //uses AN3/RB1 pin for the AD conversion functionality
@@ -78,8 +83,8 @@ void Example_ADC_Initialization(void)
     ANSBbits.ANSB1 = 1;
     TRISBbits.TRISB1 = 1;
     
-    //enables 12-bit A/D conversion (bit set to 1)
-    AD1CON1bits.MODE12 = 0x0001;
+    //enables 10-bit A/D conversion (bit set to 0)
+    AD1CON1bits.MODE12 = 0x0000;
     //Sets the format for the AD conversion data as a signed, decimal result
     //and right-justified (bits set to 01)
     AD1CON1bits.FORM = 0x0001;
