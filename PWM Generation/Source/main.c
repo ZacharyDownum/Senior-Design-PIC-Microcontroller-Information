@@ -3,9 +3,12 @@
 //Not necessary if using MPLAB X IDE because the proper PIC is
 //recognized automatically.  It is only included as a failsafe.
 #define __PIC24FJ128GA202__
+#define FCY 8000000UL
 
 #include <xc.h>
 #include <stdlib.h>
+#include <libpic30.h>
+
 
 //aliases for additional layers of abstraction
 #define true 1
@@ -42,9 +45,9 @@ void Example_PWM_Initialization(void)
     RPOR0 = 13;
     
     //OC1R / OC1RS = duty cycle %
-    OC1R = 0x0021;
+    OC1R = 0x0000;
     //sets the period
-    OC1RS = 0x0042;
+    OC1RS = 0x0063;
     
     //sets OC1 as the synchronization source
     OC1CON2 = 0x001F;
@@ -143,9 +146,21 @@ int main(void)
     
     while (true)
     {
-        //starts the A/D sampling process on AN3 (according to the initialization)
-        //AD1CON1bits.SAMP = 1;
-        //while (!AD1CON1bits.DONE);
+        int i = 0;
+        for (i = 0; i <= 0x0063; i++)
+        {
+            OC1R++;
+            __delay_ms(10);
+        }
+
+        __delay_ms(1000);
+        
+        for (i = 0; i <= 0x0063; i++)
+        {
+            OC1R--;
+            __delay_ms(10);
+        }
+        __delay_ms(1000);
     }
     
     return EXIT_SUCCESS;
